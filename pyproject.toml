@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "fingers_rsa"
+version = "1.0.0"
+description = "Stability of motor representations after paralysis"
+authors = ["Charles Guan <cguan@caltech.edu>"]
+license = "GNU GPLv3"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pynwb = "^2.1"
+pandas = "^1.2"
+xarray = "^2022.3"
+prince = {git = "https://github.com/MaxHalford/prince.git", rev="c18eff92efbac57e4cd3657a6999cee8d1fcb906"}
+rsatoolbox = "0.0.4"
+hydra-core = "^1.1"
+seaborn = "^0.12"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
