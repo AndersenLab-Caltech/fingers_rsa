@@ -1,0 +1,39 @@
+defaults:
+    - task: fingergrid
+    - array: ns_ppc
+    - task/sessions: ${task}_${array}
+    - matplotlib: confusion_matrix
+
+window:
+    length: 1.0
+    start: 0.5
+
+neuron_criteria:
+    min_firing_rate: 0.5  # Hz
+
+crossvalidation:
+    _target_: sklearn.model_selection.StratifiedKFold
+    n_splits: 8
+
+classifier:
+    _target_: sklearn.pipeline.make_pipeline
+    _args_:
+        # mean_threshold
+        - _target_: sklearn.feature_selection.SelectFromModel
+          estimator:
+              _target_: sklearn.preprocessing.StandardScaler
+          importance_getter: 'mean_'
+          threshold: 0.5  # min_spike_count
+        - _target_: sklearn.preprocessing.StandardScaler
+        - _target_: sklearn.discriminant_analysis.LinearDiscriminantAnalysis
+          solver: 'lsqr'
+          # identity covariance (after scaling), which means diagonal covariance
+          # in the original feature space
+          shrinkage: 1
+
+
+confusion_metrics:
+    calc_same_finger: false
+    calc_adjacent_fingers: true
+    include_values: true  # ConfusionMatrixDisplay values
+    values_format: ".0%"  # ConfusionMatrixDisplay values_format
