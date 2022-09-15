@@ -1,0 +1,11 @@
+savefig.format:    svg         # {png, ps, pdf, svg}
+savefig.bbox:      tight       # {tight, standard}
+svg.fonttype:      none        # {none, path}
+font.size:         16
+font.sans-serif:   Arial
+xtick.bottom:      False
+ytick.left:        False
+ytick.direction:   in          # {in, out, inout} (for colorbar)
+xtick.direction:   in          # {in, out, inout} (for colorbar)
+image.cmap:        Blues       # {viridis, ...}
+axes.grid:         false

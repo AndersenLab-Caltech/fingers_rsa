@@ -1,0 +1,6 @@
+name: FingGrid
+phase: Go
+condition_order: [T, I, M, R, P, X]
+condition_column: finger
+dandiset: '000147'
+dates: ???  # Missing value, must be populated prior to access
