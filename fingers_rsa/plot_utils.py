@@ -9,11 +9,11 @@ from typing import List
 
 
 def plot_confusion_matrix(
-        y_true: pd.Series,
-        y_pred: pd.Series,
-        label_order: List,
-        title: str = '',
-        **plot_kwargs,
+    y_true: pd.Series,
+    y_pred: pd.Series,
+    label_order: List,
+    title: str = '',
+    **plot_kwargs,
 ):
     """Helper function to plot confusion matrix."""
     conf_mat = confusion_matrix(y_true, y_pred, labels=label_order, normalize='true')

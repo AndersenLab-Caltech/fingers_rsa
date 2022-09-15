@@ -45,14 +45,16 @@ def main(cfg: DictConfig) -> None:
         results_df_list, keys=cfg.task.sessions, names=['session']
     )
 
-    accuracy, std = log_summary_metrics(all_results_df[cfg.task.condition_column], all_results_df.predicted)
+    accuracy, std = log_summary_metrics(
+        all_results_df[cfg.task.condition_column], all_results_df.predicted
+    )
 
     # Show confusion matrix
     title = (
-            'Aggregate confusion matrix for {subject}, {var_name}\n'
-            + '{trials} trials over {sessions} sessions, '
-            + '{phase}: {time_bin}\n'
-            + 'Cross-validated accuracy: {accuracy:.0%} +/- {std:.0%}'
+        'Aggregate confusion matrix for {subject}, {var_name}\n'
+        + '{trials} trials over {sessions} sessions, '
+        + '{phase}: {time_bin}\n'
+        + 'Cross-validated accuracy: {accuracy:.0%} +/- {std:.0%}'
     ).format(
         subject=cfg.array.subject_initials,
         var_name=cfg.task.condition_column,
@@ -79,7 +81,9 @@ def main(cfg: DictConfig) -> None:
     plt.show()
 
 
-def cv_results(session: str, data_folder: pathlib.Path, cfg: DictConfig) -> pd.DataFrame:
+def cv_results(
+    session: str, data_folder: pathlib.Path, cfg: DictConfig
+) -> pd.DataFrame:
     """Helper function for cross-val results for a single session.
 
     Makes it easy to pass to joblib.Parallel
@@ -109,13 +113,17 @@ def cv_results(session: str, data_folder: pathlib.Path, cfg: DictConfig) -> pd.D
     return results_df
 
 
-def read_trial_features(nwb_path: os.PathLike, cfg: DictConfig) -> Tuple[pd.DataFrame, pd.Series]:
+def read_trial_features(
+    nwb_path: os.PathLike, cfg: DictConfig
+) -> Tuple[pd.DataFrame, pd.Series]:
     with pynwb.NWBHDF5IO(nwb_path, mode='r') as nwb_file:
         nwb = nwb_file.read()
         # nwb_file must remain open while `nwb` object is in use.
 
         trial_spike_counts = nwb_utils.count_trial_spikes(
-            nwb, start=cfg.window.start, end=cfg.window.start + cfg.window.length,
+            nwb,
+            start=cfg.window.start,
+            end=cfg.window.start + cfg.window.length,
         )
         trial_labels: pd.Series = nwb.trials.to_dataframe()[cfg.task.condition_column]
 
@@ -125,14 +133,16 @@ def read_trial_features(nwb_path: os.PathLike, cfg: DictConfig) -> Tuple[pd.Data
 def log_summary_metrics(y_true: pd.Series, y_pred: pd.Series) -> Tuple[float, float]:
     # Get average accuracy and standard deviation (weighted by trial counts) across sessions
     is_predict_correct = y_true == y_pred
-    summary = is_predict_correct.groupby(level='session').agg(
-        ['mean', 'count']
-    )
+    summary = is_predict_correct.groupby(level='session').agg(['mean', 'count'])
     wdf = DescrStatsW(summary['mean'], weights=summary['count'], ddof=1)
     accuracy = accuracy_score(y_true, y_pred)
-    log.info('Accuracy: {:.0%} +/- {:.0%} over {:d} sessions.'.format(
-        accuracy, wdf.std, len(summary),
-    ))
+    log.info(
+        'Accuracy: {:.0%} +/- {:.0%} over {:d} sessions.'.format(
+            accuracy,
+            wdf.std,
+            len(summary),
+        )
+    )
     np.testing.assert_almost_equal(
         accuracy, wdf.mean, err_msg='accuracy calculations should match'
     )
