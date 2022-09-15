@@ -1,14 +1,15 @@
 """Helper functions for working with PyNWB data structures"""
 
-import pynwb
-
 import numpy as np
 import pandas as pd
+import pynwb
 import tqdm
 
 
 def count_trial_spikes(
-    nwb: pynwb.file.NWBFile, start: float = 0.0, end: float = 1.0
+    nwb: pynwb.file.NWBFile,
+    start: float = 0.0,
+    end: float = 1.0,
 ) -> pd.DataFrame:
     """Count spikes within the trial-aligned interval.
 
@@ -44,12 +45,12 @@ def align_spike_times_to_trials(
     trials = nwb.trials
 
     trial_times = trials.to_dataframe().start_time
-    trial_times.index.name = 'trial_id'
+    trial_times.index.name = "trial_id"
     include_intervals = pd.DataFrame(
         {
-            'start': trial_times + start,
-            'end': trial_times + end,
-            'reference': trial_times,
+            "start": trial_times + start,
+            "end": trial_times + end,
+            "reference": trial_times,
         }
     )
 
@@ -60,7 +61,7 @@ def align_spike_times_to_trials(
         )
         for _, interval in tqdm.tqdm(
             include_intervals.iterrows(),
-            desc=f'aligning trials {nwb.session_id}',
+            desc=f"aligning trials {nwb.session_id}",
             total=len(include_intervals),
         )
     ]
@@ -98,5 +99,5 @@ def align_spike_times_to_absolute_interval(
     population_spike_times = pd.Series(
         relative_spike_times_list, index=units.to_dataframe().index
     )
-    population_spike_times.index.name = 'unit_id'
+    population_spike_times.index.name = "unit_id"
     return population_spike_times

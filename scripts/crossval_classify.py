@@ -1,29 +1,24 @@
 """Classify task variable using cross-validation and plot the confusion matrix.
 """
-import pynwb
-import pandas as pd
-import numpy as np
+import logging
+import os
+import pathlib
+from typing import Tuple
 
+import hydra
+import joblib
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import pynwb
+from hydra.utils import get_original_cwd
+from omegaconf import DictConfig, OmegaConf
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_val_predict
 from statsmodels.stats.weightstats import DescrStatsW
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-
-import hydra
-from hydra.utils import get_original_cwd
-from omegaconf import DictConfig, OmegaConf
-
-import joblib
-
-import logging
-import os
-import pathlib
-from typing import List, Tuple
-
 from fingers_rsa import nwb_utils, plot_utils
-
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +30,7 @@ def main(cfg: DictConfig) -> None:
     plt.rcParams.update(cfg.matplotlib)
 
     # Convert config parameters as needed
-    data_folder = pathlib.Path(get_original_cwd()).joinpath('data', cfg.task.dandiset)
+    data_folder = pathlib.Path(get_original_cwd()).joinpath("data", cfg.task.dandiset)
 
     # Build up list of cross-validated predictions
     results_df_list = joblib.Parallel(n_jobs=-2)(
@@ -43,7 +38,7 @@ def main(cfg: DictConfig) -> None:
         for session in cfg.task.sessions
     )
     all_results_df: pd.DataFrame = pd.concat(
-        results_df_list, keys=cfg.task.sessions, names=['session']
+        results_df_list, keys=cfg.task.sessions, names=["session"]
     )
 
     accuracy, std = log_summary_metrics(
@@ -52,10 +47,10 @@ def main(cfg: DictConfig) -> None:
 
     # Show confusion matrix
     title = (
-        'Aggregate confusion matrix for {subject}, {var_name}\n'
-        + '{trials} trials over {sessions} sessions, '
-        + '{phase}: {time_bin}\n'
-        + 'Cross-validated accuracy: {accuracy:.0%} +/- {std:.0%}'
+        "Aggregate confusion matrix for {subject}, {var_name}\n"
+        + "{trials} trials over {sessions} sessions, "
+        + "{phase}: {time_bin}\n"
+        + "Cross-validated accuracy: {accuracy:.0%} +/- {std:.0%}"
     ).format(
         subject=cfg.array.subject_initials,
         var_name=cfg.task.condition_column,
@@ -72,12 +67,12 @@ def main(cfg: DictConfig) -> None:
         all_results_df.predicted,
         cfg.task.condition_order,
         title=title,
-        cmap=mpl.rcParams['image.cmap'],
+        cmap=mpl.rcParams["image.cmap"],
         ax=ax,
         include_values=cfg.confusion_metrics.include_values,
         values_format=cfg.confusion_metrics.values_format,
     )
-    fig.savefig(f'crossval_confusion_matrix_{cfg.task.condition_column}')
+    fig.savefig(f"crossval_confusion_matrix_{cfg.task.condition_column}")
 
     plt.show()
 
@@ -96,10 +91,10 @@ def cv_results(
     :returns: DataFrame with true and crossval-predicted labels for each trial
     """
     nwb_path = data_folder.joinpath(
-        f'sub-{cfg.array.subject}',
-        f'sub-{cfg.array.subject}_ses-{session}_ecephys.nwb',
+        f"sub-{cfg.array.subject}",
+        f"sub-{cfg.array.subject}_ses-{session}_ecephys.nwb",
     )
-    log.debug('Loading NWB file: {}'.format(nwb_path))
+    log.debug("Loading NWB file: {}".format(nwb_path))
     trial_spike_counts, trial_labels = read_trial_features(nwb_path, cfg)
 
     # Classifier and cross-validation methods
@@ -111,12 +106,12 @@ def cv_results(
         trial_labels.values,
         cv=cv,
         n_jobs=-1,
-        method='predict',
+        method="predict",
     )
     results_df = trial_labels.to_frame()
-    results_df['predicted'] = trial_pred
+    results_df["predicted"] = trial_pred
 
-    log.debug('Finished processing NWB file: {}'.format(nwb_path))
+    log.debug("Finished processing NWB file: {}".format(nwb_path))
     return results_df
 
 
@@ -129,7 +124,7 @@ def read_trial_features(
     :param cfg: Hydra config object
     :returns: tuple of (spike counts, labels)
     """
-    with pynwb.NWBHDF5IO(nwb_path, mode='r') as nwb_file:
+    with pynwb.NWBHDF5IO(nwb_path, mode="r") as nwb_file:
         nwb = nwb_file.read()
         # nwb_file must remain open while `nwb` object is in use.
 
@@ -150,20 +145,21 @@ def log_summary_metrics(y_true: pd.Series, y_pred: pd.Series) -> Tuple[float, fl
     :param y_pred: predicted labels
     :returns: tuple of (accuracy, weighted standard deviation)
     """
-    # Get average accuracy and standard deviation (weighted by trial counts) across sessions
+    # Get average accuracy and standard deviation (weighted by trial counts)
+    # across sessions
     is_predict_correct = y_true == y_pred
-    summary = is_predict_correct.groupby(level='session').agg(['mean', 'count'])
-    wdf = DescrStatsW(summary['mean'], weights=summary['count'], ddof=1)
+    summary = is_predict_correct.groupby(level="session").agg(["mean", "count"])
+    wdf = DescrStatsW(summary["mean"], weights=summary["count"], ddof=1)
     accuracy = accuracy_score(y_true, y_pred)
     log.info(
-        'Accuracy: {:.0%} +/- {:.0%} over {:d} sessions.'.format(
+        "Accuracy: {:.0%} +/- {:.0%} over {:d} sessions.".format(
             accuracy,
             wdf.std,
             len(summary),
         )
     )
     np.testing.assert_almost_equal(
-        accuracy, wdf.mean, err_msg='accuracy calculations should match'
+        accuracy, wdf.mean, err_msg="accuracy calculations should match"
     )
 
     return accuracy, wdf.std
