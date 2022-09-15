@@ -1,9 +1,33 @@
 """Helper functions for working with PyNWB data structures"""
 
+import os
+from typing import Tuple
+
 import numpy as np
 import pandas as pd
 import pynwb
 import tqdm
+
+
+def read_trial_features(
+    nwb_path: os.PathLike, label_column: str, start: float, end: float,
+) -> Tuple[pd.DataFrame, pd.Series]:
+    """Reads trial spike counts and labels from NWB file.
+
+    :param nwb_path: path to NWB file
+    :param label_column: name of column with labels
+    :param start: start time in seconds, relative to trial start time
+    :param end: end time in seconds, relative to trial start time
+    :returns: tuple of (spike counts, labels)
+    """
+    with pynwb.NWBHDF5IO(nwb_path, mode="r") as nwb_file:
+        nwb = nwb_file.read()
+        # nwb_file must remain open while `nwb` object is in use.
+
+        trial_spike_counts = count_trial_spikes(nwb, start=start, end=end)
+        trial_labels: pd.Series = nwb.trials.to_dataframe()[label_column]
+
+    return trial_spike_counts, trial_labels
 
 
 def count_trial_spikes(

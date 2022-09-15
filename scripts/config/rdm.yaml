@@ -1,0 +1,14 @@
+defaults:
+    - task: fingergrid
+    - array: ns_ppc
+    - task/sessions: ${task}_${array}
+    - matplotlib: rdm
+    - override hydra/job_logging: colorlog
+    - _self_ # Override defaults list with below values
+
+window:
+    length: 1.0
+    start: 0.5
+
+metrics:
+    distance: poisson_cv
