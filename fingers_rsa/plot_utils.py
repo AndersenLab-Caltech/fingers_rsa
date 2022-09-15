@@ -15,7 +15,15 @@ def plot_confusion_matrix(
     title: str = '',
     **plot_kwargs,
 ):
-    """Helper function to plot confusion matrix."""
+    """Plot confusion matrix on a [0, 100%] scale.
+
+    :param y_true: true labels
+    :param y_pred: predicted labels
+    :param label_order: order of labels on axes
+    :param title: title for plot
+    :param plot_kwargs: additional keyword arguments to pass to
+        ConfusionMatrixDisplay
+    """
     conf_mat = confusion_matrix(y_true, y_pred, labels=label_order, normalize='true')
     disp = ConfusionMatrixDisplay(confusion_matrix=conf_mat, display_labels=label_order)
     disp.plot(**plot_kwargs)

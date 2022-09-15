@@ -1,4 +1,5 @@
-"""Classify task variable (such as movement)."""
+"""Classify task variable using cross-validation and plot the confusion matrix.
+"""
 import pynwb
 import pandas as pd
 import numpy as np
@@ -84,9 +85,15 @@ def main(cfg: DictConfig) -> None:
 def cv_results(
     session: str, data_folder: pathlib.Path, cfg: DictConfig
 ) -> pd.DataFrame:
-    """Helper function for cross-val results for a single session.
+    """Calculates cross-validation results for a single session.
 
-    Makes it easy to pass to joblib.Parallel
+    Wraps logic so this can easily be run within a joblib.Parallel session.
+
+    :param session: identifier for session to analyze
+    :param data_folder: folder with NWB files
+    :param cfg: Hydra config object
+
+    :returns: DataFrame with true and crossval-predicted labels for each trial
     """
     nwb_path = data_folder.joinpath(
         f'sub-{cfg.array.subject}',
@@ -116,6 +123,12 @@ def cv_results(
 def read_trial_features(
     nwb_path: os.PathLike, cfg: DictConfig
 ) -> Tuple[pd.DataFrame, pd.Series]:
+    """Reads trial spike counts and labels from NWB file.
+
+    :param nwb_path: path to NWB file
+    :param cfg: Hydra config object
+    :returns: tuple of (spike counts, labels)
+    """
     with pynwb.NWBHDF5IO(nwb_path, mode='r') as nwb_file:
         nwb = nwb_file.read()
         # nwb_file must remain open while `nwb` object is in use.
@@ -131,6 +144,12 @@ def read_trial_features(
 
 
 def log_summary_metrics(y_true: pd.Series, y_pred: pd.Series) -> Tuple[float, float]:
+    """Logs metrics for classification predictions across sessions.
+
+    :param y_true: true labels
+    :param y_pred: predicted labels
+    :returns: tuple of (accuracy, weighted standard deviation)
+    """
     # Get average accuracy and standard deviation (weighted by trial counts) across sessions
     is_predict_correct = y_true == y_pred
     summary = is_predict_correct.groupby(level='session').agg(['mean', 'count'])

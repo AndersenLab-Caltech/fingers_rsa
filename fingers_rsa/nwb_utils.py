@@ -10,6 +10,15 @@ import tqdm
 def count_trial_spikes(
     nwb: pynwb.file.NWBFile, start: float = 0.0, end: float = 1.0
 ) -> pd.DataFrame:
+    """Count spikes within the trial-aligned interval.
+
+    :param nwb: NeuroDataWithoutBorders object including `trials` and `units`
+    :param start: start time in seconds, relative to trial start
+    :param end: end time in seconds, relative to trial start
+
+    :returns: DataFrame of spike counts, indexed by trial (rows) and unit
+        (columns)
+    """
     times_df = align_spike_times_to_trials(nwb, start=start, end=end)
     count_df = times_df.applymap(len)
     return count_df
@@ -20,9 +29,16 @@ def align_spike_times_to_trials(
     start: float = 0.0,
     end: float = 1.0,
 ) -> pd.DataFrame:
-    """Return the spikes within the interval.
+    """Find trial-aligned spike times for each unit.
 
-    Rows are trials, columns are
+    Only returns spikes within the given trial-relative interval.
+
+    :param nwb: NeuroDataWithoutBorders object including `trials` and `units`
+    :param start: start time in seconds, relative to trial start
+    :param end: end time in seconds, relative to trial start
+
+    :returns: DataFrame of trial-relative spike times, indexed by trial (rows)
+        and unit (columns)
     """
     units = nwb.units
     trials = nwb.trials
@@ -62,7 +78,16 @@ def align_spike_times_to_absolute_interval(
     end: float,
     reference: float,
 ) -> pd.Series:
-    """Times are referenced to NWBFile reference"""
+    """Find the spike times for each unit that fall within the given interval.
+
+    :param units: NWB units table
+    :param start: start time in seconds, relative to session-reference
+    :param end: end time in seconds, relative to session-reference
+    :param reference: reference time in seconds, relative to session-reference
+
+    :returns: Series of spike times (with `reference` subtracted), indexed by
+        unit
+    """
     num_units = len(units)
     relative_spike_times_list = []
     for unit_idx in range(num_units):
