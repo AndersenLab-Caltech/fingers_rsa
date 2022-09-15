@@ -1,18 +1,17 @@
 """Plotting utilities"""
 
-import matplotlib.pyplot as plt
-from matplotlib.ticker import PercentFormatter
-import pandas as pd
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-
 from typing import List
+
+import pandas as pd
+from matplotlib.ticker import PercentFormatter
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 
 def plot_confusion_matrix(
     y_true: pd.Series,
     y_pred: pd.Series,
     label_order: List,
-    title: str = '',
+    title: str = "",
     **plot_kwargs,
 ):
     """Plot confusion matrix on a [0, 100%] scale.
@@ -24,7 +23,7 @@ def plot_confusion_matrix(
     :param plot_kwargs: additional keyword arguments to pass to
         ConfusionMatrixDisplay
     """
-    conf_mat = confusion_matrix(y_true, y_pred, labels=label_order, normalize='true')
+    conf_mat = confusion_matrix(y_true, y_pred, labels=label_order, normalize="true")
     disp = ConfusionMatrixDisplay(confusion_matrix=conf_mat, display_labels=label_order)
     disp.plot(**plot_kwargs)
     disp.im_.set_clim(0, 1)
