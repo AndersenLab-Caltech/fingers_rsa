@@ -1,5 +1,7 @@
 # Preserved motor representations after paralysis
 
+[![](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.anaconda.com//)
+
 This repository contains the scripts to generate figures for [Preserved motor representations after paralysis](https://www.biorxiv.org/content/10.1101/2021.10.07.463105).
 
 ## Dataset
