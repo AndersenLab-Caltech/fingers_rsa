@@ -4,8 +4,13 @@ from omegaconf import DictConfig
 
 
 def filename(cfg: DictConfig) -> str:
+    """Generate filename for RDM.
+
+    :param cfg: Hydra config object, including task info
+    :return: filename for RDM
+    """
     return (
-        "rdm_{task}_{subject}_arr{array}{neurons}_{distance_metric}" "_{time_window}"
+        "rdm_{task}_{subject}_arr{array}{neurons}_{distance_metric}_{time_window}"
     ).format(
         task=cfg.task.name,
         subject=cfg.array.subject,
