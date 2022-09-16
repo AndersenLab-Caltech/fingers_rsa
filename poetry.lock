@@ -194,6 +194,24 @@ colorama = {version = "*", markers = "sys_platform == \"win32\""}
 development = ["black", "flake8", "mypy", "pytest", "types-colorama"]
 
 [[package]]
+name = "contourpy"
+version = "1.0.5"
+description = "Python library for calculating contours of 2D quadrilateral grids"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+numpy = ">=1.16"
+
+[package.extras]
+test-no-codebase = ["pillow", "matplotlib", "pytest"]
+test-minimal = ["pytest"]
+test = ["isort", "flake8", "pillow", "matplotlib", "pytest"]
+docs = ["sphinx-rtd-theme", "sphinx", "docutils (<0.18)"]
+bokeh = ["selenium", "bokeh"]
+
+[[package]]
 name = "coverage"
 version = "6.4.4"
 description = "Code coverage measurement for Python"
@@ -665,11 +683,11 @@ test = ["async-timeout", "trio", "testpath", "pytest-asyncio (>=0.17)", "pytest-
 
 [[package]]
 name = "joblib"
-version = "1.1.0"
+version = "1.2.0"
 description = "Lightweight pipelining with Python functions"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [[package]]
 name = "jsonpointer"
@@ -749,22 +767,23 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "matplotlib"
-version = "3.5.3"
+version = "3.6.0"
 description = "Python plotting package"
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 
 [package.dependencies]
+contourpy = ">=1.0.1"
 cycler = ">=0.10"
 fonttools = ">=4.22.0"
 kiwisolver = ">=1.0.1"
-numpy = ">=1.17"
+numpy = ">=1.19"
 packaging = ">=20.0"
 pillow = ">=6.2.0"
 pyparsing = ">=2.2.1"
 python-dateutil = ">=2.7"
-setuptools_scm = ">=4,<7"
+setuptools_scm = ">=7"
 
 [[package]]
 name = "mccabe"
@@ -851,7 +870,7 @@ python-versions = ">=3.8"
 
 [[package]]
 name = "nwbinspector"
-version = "0.4.12"
+version = "0.4.13"
 description = "Tool to inspect NWB files for best practices compliance."
 category = "main"
 optional = false
@@ -861,6 +880,7 @@ python-versions = "*"
 click = "*"
 jsonschema = "*"
 natsort = "*"
+numpy = {version = ">=1.20.0,<1.23.0", markers = "python_version >= \"3.8\""}
 packaging = "*"
 pynwb = "*"
 PyYAML = "*"
@@ -1175,11 +1195,11 @@ python-versions = "*"
 
 [[package]]
 name = "pywavelets"
-version = "1.4.0"
+version = "1.4.1"
 description = "PyWavelets, wavelet transform module"
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 
 [package.dependencies]
 numpy = ">=1.17.3"
@@ -1378,15 +1398,16 @@ doc = ["sphinx", "sphinx-rtd-theme"]
 
 [[package]]
 name = "setuptools-scm"
-version = "6.4.2"
+version = "7.0.5"
 description = "the blessed package to manage your versions by scm tags"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.dependencies]
 packaging = ">=20.0"
 tomli = ">=1.0.0"
+typing-extensions = "*"
 
 [package.extras]
 test = ["pytest (>=6.2)", "virtualenv (>20)"]
@@ -1618,7 +1639,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "e9f12c2929be012f5e6ba2c24a6138f8e4850088d98193d0134add41072e105b"
+content-hash = "3654d401ea0e51b233c690ad9235a019360b29481c2f68724b78f67e81f10d59"
 
 [metadata.files]
 antlr4-python3-runtime = []
@@ -1654,6 +1675,7 @@ click-didyoumean = [
 ]
 colorama = []
 colorlog = []
+contourpy = []
 coverage = []
 cryptography = []
 cycler = [
@@ -1723,10 +1745,7 @@ jedi = [
     {file = "jedi-0.18.1.tar.gz", hash = "sha256:74137626a64a99c8eb6ae5832d99b3bdd7d29a3850fe2aa80a4126b2a7d949ab"},
 ]
 jeepney = []
-joblib = [
-    {file = "joblib-1.1.0-py2.py3-none-any.whl", hash = "sha256:f21f109b3c7ff9d95f8387f752d0d9c34a02aa2f7060c2135f465da0e5160ff6"},
-    {file = "joblib-1.1.0.tar.gz", hash = "sha256:4158fcecd13733f8be669be0683b96ebdbbd38d23559f54dca7205aea1bf1e35"},
-]
+joblib = []
 jsonpointer = []
 jsonschema = []
 keyring = []
@@ -1933,10 +1952,7 @@ scipy = [
 seaborn = []
 secretstorage = []
 semantic-version = []
-setuptools-scm = [
-    {file = "setuptools_scm-6.4.2-py3-none-any.whl", hash = "sha256:acea13255093849de7ccb11af9e1fb8bde7067783450cee9ef7a93139bddf6d4"},
-    {file = "setuptools_scm-6.4.2.tar.gz", hash = "sha256:6833ac65c6ed9711a4d5d2266f8024cfa07c533a0e55f4c12f6eff280a5a9e30"},
-]
+setuptools-scm = []
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},

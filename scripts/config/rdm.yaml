@@ -1,0 +1,17 @@
+defaults:
+  - task: fingergrid
+  - array: ns_ppc
+  - matplotlib: rdm
+  - override hydra/job_logging: colorlog
+  - _self_ # Override defaults list with below values
+
+session: ???
+
+window:
+  length: 1.0
+  start: 0.5
+
+metrics:
+  distance: crossnobis
+
+rdm_file_type: hdf5

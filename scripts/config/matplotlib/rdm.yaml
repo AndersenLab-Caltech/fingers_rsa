@@ -1,0 +1,9 @@
+savefig.format: svg # {png, ps, pdf, svg}
+savefig.bbox: tight # {tight, standard}
+svg.fonttype: none # {none, path}
+font.family: sans-serif
+font.sans-serif: Arial
+xtick.bottom: False
+ytick.left: False
+image.cmap: viridis # {viridis, Blues, ...}
+image.interpolation: none # {none, antialiased, ...} prevent blurring
