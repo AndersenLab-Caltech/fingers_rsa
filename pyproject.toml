@@ -9,6 +9,7 @@ license = "GNU GPLv3"
 python = "^3.8"
 pynwb = "^2.1"
 pandas = "^1.2"
+numpy = "^1.13"
 xarray = "^2022.3"
 prince = {git = "https://github.com/MaxHalford/prince.git", rev="c18eff92efbac57e4cd3657a6999cee8d1fcb906"}
 rsatoolbox = "0.0.4"
