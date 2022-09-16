@@ -17,7 +17,7 @@ from fingers_rsa import nwb_utils, rdm_utils
 log = logging.getLogger(__name__)
 
 
-@hydra.main(config_path="config", config_name="rdm", version_base="1.1")
+@hydra.main(config_path="config", config_name="rdm", version_base=None)
 def main(cfg: DictConfig) -> None:
     # noinspection DuplicatedCode
     log.debug("Config args:\n{}".format(OmegaConf.to_yaml(cfg)))

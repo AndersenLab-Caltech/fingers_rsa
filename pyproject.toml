@@ -13,8 +13,8 @@ numpy = "^1.13"
 xarray = "^2022.3"
 prince = {git = "https://github.com/MaxHalford/prince.git", rev="c18eff92efbac57e4cd3657a6999cee8d1fcb906"}
 rsatoolbox = "0.0.4"
-hydra-core = "^1.1"
-hydra-colorlog = "^1.1"
+hydra-core = "^1.2"
+hydra-colorlog = "^1.2"
 matplotlib = "^3.5"
 scikit-learn = "^1.0"
 seaborn = "^0.12"
@@ -24,7 +24,7 @@ joblib = "^1.1"
 tqdm = ">=4.0"
 
 [tool.poetry.dev-dependencies]
-hydra-joblib-launcher = "^1.1"  # Parallel job launching
+hydra-joblib-launcher = "^1.2"  # Parallel job launching
 pudb = ""       # debugger
 pre-commit = "" # hooks for applying linters on commit
 black = ""      # code formatting
