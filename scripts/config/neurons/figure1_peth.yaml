@@ -1,0 +1,18 @@
+# @package _global_
+neurons:
+  - electrode: 26
+    pedestal: 1
+    unit: 1
+    session: 2018-10-22
+  - electrode: 83
+    pedestal: 1
+    unit: 1
+    session: 2018-09-10
+  - electrode: 13
+    pedestal: 1
+    unit: 1
+    session: 2018-10-22
+  - electrode: 81
+    pedestal: 1
+    unit: 1
+    session: 2018-09-10
