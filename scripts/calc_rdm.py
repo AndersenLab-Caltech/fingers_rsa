@@ -44,7 +44,7 @@ def main(cfg: DictConfig) -> None:
 
     # Save out RDMs for loading from future scripts.
     rdm_file_name = rdm_name + "." + cfg.rdm_file_type
-    log.info("Saving RDMs to: {}".format(rdm_file_name))
+    log.info("Saving RDMs to: {}".format(os.path.abspath(rdm_file_name)))
     rdm.save(rdm_file_name, file_type=cfg.rdm_file_type, overwrite=True)
 
     # Save out RDM plots
@@ -61,7 +61,7 @@ def main(cfg: DictConfig) -> None:
         num_pattern_groups=num_pattern_groups,
     )
     rdm_plot_name = rdm_name + "." + plt.rcParams["savefig.format"]
-    log.info("Saving RDM plot to: {}".format(rdm_plot_name))
+    log.info("Saving RDM plot to: {}".format(os.path.abspath(rdm_plot_name)))
     fig.savefig(rdm_plot_name)
 
     plt.show()
