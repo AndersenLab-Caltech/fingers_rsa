@@ -1,7 +1,6 @@
 defaults:
-  - task: fingergrid
   - array: ns_ppc
-  - matplotlib: rdm
+  - rsa/models: able_bodied
   - override hydra/job_logging: colorlog
   - _self_ # Override defaults list with below values
 
