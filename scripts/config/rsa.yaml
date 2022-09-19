@@ -1,0 +1,11 @@
+defaults:
+  - task: fingergrid
+  - array: ns_ppc
+  - matplotlib: rdm
+  - override hydra/job_logging: colorlog
+  - _self_ # Override defaults list with below values
+
+metrics:
+  similarity: cosine_cov
+
+rdm_files: "multirun/2022-09-16/13-46-26/*/*_rdm.hdf5"
