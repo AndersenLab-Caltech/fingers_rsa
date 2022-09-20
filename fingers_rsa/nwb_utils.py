@@ -1,7 +1,7 @@
 """Helper functions for working with PyNWB data structures"""
 
 import os
-from typing import Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,10 @@ import tqdm
 
 
 def read_trial_features(
-    nwb_path: os.PathLike, label_column: str, start: float, end: float,
+    nwb_path: os.PathLike,
+    label_column: str,
+    start: float,
+    end: float,
 ) -> Tuple[pd.DataFrame, pd.Series]:
     """Reads trial spike counts and labels from NWB file.
 
@@ -53,6 +56,7 @@ def align_spike_times_to_trials(
     nwb: pynwb.file.NWBFile,
     start: float = 0.0,
     end: float = 1.0,
+    include_units: Optional[List[int]] = None,
 ) -> pd.DataFrame:
     """Find trial-aligned spike times for each unit.
 
@@ -61,6 +65,7 @@ def align_spike_times_to_trials(
     :param nwb: NeuroDataWithoutBorders object including `trials` and `units`
     :param start: start time in seconds, relative to trial start
     :param end: end time in seconds, relative to trial start
+    :param include_units: list of unit indices to include, or None to include all
 
     :returns: DataFrame of trial-relative spike times, indexed by trial (rows)
         and unit (columns)
@@ -82,6 +87,7 @@ def align_spike_times_to_trials(
         align_spike_times_to_absolute_interval(
             units,
             **interval,
+            include_units=include_units,
         )
         for _, interval in tqdm.tqdm(
             include_intervals.iterrows(),
@@ -102,6 +108,7 @@ def align_spike_times_to_absolute_interval(
     start: float,
     end: float,
     reference: float,
+    include_units: Optional[List[int]] = None,
 ) -> pd.Series:
     """Find the spike times for each unit that fall within the given interval.
 
@@ -109,19 +116,24 @@ def align_spike_times_to_absolute_interval(
     :param start: start time in seconds, relative to session-reference
     :param end: end time in seconds, relative to session-reference
     :param reference: reference time in seconds, relative to session-reference
+    :param include_units: list of unit indices to include, or None to include all
 
     :returns: Series of spike times (with `reference` subtracted), indexed by
         unit
     """
-    num_units = len(units)
+    if include_units is None:
+        include_units = units.id.data[:]
+
     relative_spike_times_list = []
-    for unit_idx in range(num_units):
+    for unit_idx in include_units:
         unit_spike_times: np.ndarray = units.get_unit_spike_times(
             unit_idx, (start, end)
         )
         relative_spike_times_list.append(unit_spike_times - reference)
+
     population_spike_times = pd.Series(
-        relative_spike_times_list, index=units.to_dataframe().index
+        relative_spike_times_list,
+        index=include_units,
     )
     population_spike_times.index.name = "unit_id"
     return population_spike_times
