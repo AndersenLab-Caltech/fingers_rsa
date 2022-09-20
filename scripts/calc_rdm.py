@@ -64,8 +64,6 @@ def main(cfg: DictConfig) -> None:
     log.info("Saving RDM plot to: {}".format(os.path.abspath(rdm_plot_name)))
     fig.savefig(rdm_plot_name)
 
-    plt.show()
-
 
 def generate_rdm(
     measurements: np.ndarray,
