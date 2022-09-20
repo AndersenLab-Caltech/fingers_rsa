@@ -52,7 +52,7 @@ def main(cfg: DictConfig) -> None:
         + "{phase}: {time_bin}\n"
         + "Cross-validated accuracy: {accuracy:.0%} +/- {std:.0%}"
     ).format(
-        subject=cfg.array.subject_initials,
+        subject=cfg.array.subject_display_id,
         var_name=cfg.task.condition_column,
         trials=len(all_results_df),
         sessions=len(cfg.task.sessions),

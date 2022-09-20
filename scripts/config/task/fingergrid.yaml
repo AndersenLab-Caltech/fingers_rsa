@@ -4,4 +4,4 @@ condition_order: [T, I, M, R, P, X]
 null_condition: X
 condition_column: finger
 dandiset: "000147"
-dates: ??? # Missing value, must be populated prior to access
+sessions: ??? # Missing value, must be populated prior to access
