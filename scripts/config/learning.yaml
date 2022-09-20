@@ -1,0 +1,7 @@
+defaults:
+  - array: ns_ppc
+  - rsa/models: able_bodied_pcip
+  - override hydra/job_logging: colorlog
+  - _self_ # Override defaults list with below values
+
+rdm_files: "multirun/2022-09-20/11-50-36/*/*_rdm.hdf5"
