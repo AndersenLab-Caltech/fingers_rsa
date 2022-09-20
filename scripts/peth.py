@@ -52,8 +52,10 @@ def plot_peth(session: str, unit: typing.Any, cfg: DictConfig) -> None:
         f"sub-{cfg.array.subject}_ses-{session}_ecephys.nwb",
     )
 
+    # Grab spikes before/after end of plotting window, as these also contribute
+    # to smoothed firing rate
+    border = cfg.plot.smooth.border_factor * cfg.plot.smooth.width
     # Load NWB spike times, aligned to trial.
-    border = 3  # TODO: Make this a config parameter
     with pynwb.NWBHDF5IO(nwb_path, mode="r") as nwb_file:
         nwb = nwb_file.read()
         # nwb_file must remain open while `nwb` object is in use.
@@ -74,7 +76,7 @@ def plot_peth(session: str, unit: typing.Any, cfg: DictConfig) -> None:
     )
     firing_rates = [
         convolve_func(
-            sample_time, trial_spike_times_df.loc[:, unit], cfg.plot.smooth_width
+            sample_time, trial_spike_times_df.loc[:, unit], cfg.plot.smooth.width
         )
         for sample_time in sample_times
     ]

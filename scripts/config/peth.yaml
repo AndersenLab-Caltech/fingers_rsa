@@ -10,7 +10,9 @@ plot:
     start: 0.1
     end: 1.5
     step: 0.05 # seconds
-  smooth_width: 0.05 # seconds
+  smooth:
+    width: 0.05 # seconds
+    border_factor: 10 # factor * width
 
 # Rename multirun sub-directories based on overrides
 hydra:
