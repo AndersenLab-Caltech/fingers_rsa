@@ -1,0 +1,9 @@
+style: ticks
+palette: # Tol_bright, https://personal.sron.nl/~pault/#sec:qualitative
+  - "#4477AA"
+  - "#66CCEE"
+  - "#228833"
+  - "#CCBB44"
+  - "#EE6677"
+  - "#AA3377"
+font_scale: 2

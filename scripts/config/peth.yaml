@@ -1,0 +1,20 @@
+defaults:
+  - task: fingergrid
+  - array: ns_ppc
+  - matplotlib: peth
+  - seaborn: tol_bright
+  - neurons: figure1_peth
+
+plot:
+  window:
+    start: 0.1
+    end: 1.5
+    step: 0.05 # seconds
+  smooth:
+    width: 0.05 # seconds
+    border_factor: 10 # factor * width
+
+# Rename multirun sub-directories based on overrides
+hydra:
+  sweep:
+    subdir: ${hydra.job.override_dirname}

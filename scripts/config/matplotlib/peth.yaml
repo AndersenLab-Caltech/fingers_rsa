@@ -1,0 +1,9 @@
+axes.spines.top: False
+axes.spines.right: False
+axes.spines.bottom: False
+xtick.bottom: False
+savefig.format: svg
+savefig.bbox: tight
+svg.fonttype: none # {none, path}
+font.sans-serif: Arial
+ytick.direction: in # {in, out, inout}

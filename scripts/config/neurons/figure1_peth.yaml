@@ -1,0 +1,10 @@
+# @package _global_
+neurons:
+  - unit: 80
+    session: 2018-09-10
+  - unit: 83
+    session: 2018-09-10
+  - unit: 11
+    session: 2018-10-22
+  - unit: 25
+    session: 2018-10-22
