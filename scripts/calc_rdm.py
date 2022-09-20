@@ -93,7 +93,13 @@ def generate_rdm(
 
     # Convert data rsatoolbox Dataset object
     observation_descriptors = {cfg.task.condition_column: trial_labels}
-    descriptors = {"task_name": cfg.task.name, "subject": cfg.array.subject}
+    descriptors = {
+        "task_name": cfg.task.name,
+        "subject": cfg.array.subject,
+        "session": cfg.session,
+        "window_center": cfg.window.start + cfg.window.length / 2,
+        "window_length": cfg.window.length,
+    }
     dataset = rsatoolbox.data.Dataset(
         measurements=measurements,
         descriptors=descriptors,
@@ -103,7 +109,6 @@ def generate_rdm(
     rdm = rsatoolbox.rdm.calc_rdm(
         dataset, method=cfg.metrics.distance, descriptor=cfg.task.condition_column
     )
-    rdm.rdm_descriptors["session"] = [cfg.session]
 
     # Sort RDMs by condition order for visualization
     rdm.sort_by(**{cfg.task.condition_column: condition_order})
