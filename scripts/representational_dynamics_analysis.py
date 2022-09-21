@@ -75,7 +75,7 @@ def main(cfg: DictConfig) -> None:
         x="window_center",
         y=value_name,
         hue="model",
-        # TODO: double-check error-bar matches previous version
+        hue_order=cfg.rsa.models,
         errorbar="sd",  # standard deviation of bootstrap -> confidence interval
     )
 
