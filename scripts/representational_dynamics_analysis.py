@@ -25,7 +25,7 @@ def main(cfg: DictConfig) -> None:
     filename_prefix = filename(cfg)
 
     # Load in models. These should be saved as RDM files, too.
-    model_rdms = load_models(cfg.rsa.models)
+    model = load_models(cfg.rsa.models)
 
     # Read in the RDM files
     data_rdm_list = [rsatoolbox.rdm.load_rdm(rdm_file) for rdm_file in data_rdm_files]
@@ -45,10 +45,10 @@ def main(cfg: DictConfig) -> None:
 
     # Group RDMs by window center to concatenate
     rdm_df = pd.DataFrame({"window_center": window_center_list, "rdm": data_rdm_list})
-    rdm_times_ser = rdm_df.groupby("window_center")["rdm"].apply(rsatoolbox.rdm.concat)
+    data_rdms_ser = rdm_df.groupby("window_center")["rdm"].apply(rsatoolbox.rdm.concat)
 
     # Validate data
-    rdm_counts = rdm_times_ser.apply(lambda rdm: rdm.n_rdm)
+    rdm_counts = data_rdms_ser.apply(lambda rdm: rdm.n_rdm)
     np.testing.assert_array_equal(
         rdm_counts,
         rdm_counts.iloc[0],
@@ -59,12 +59,11 @@ def main(cfg: DictConfig) -> None:
     ).all(), "Need more than one RDM to calculate RSA confidence intervals"
 
     # RDA: run representational similarity analysis for each window center
-    method = "cosine_cov"  # TODO: update to NNLS
-    results_ser = rdm_times_ser.apply(
+    method = "cosine_cov"  # Method for normalization
+    results_ser = data_rdms_ser.apply(
         lambda data_rdms: rsatoolbox.inference.eval_bootstrap_rdm(
-            models=model_rdms,
+            models=model,
             data=data_rdms,
-            method=method,
         )
     )
 
@@ -110,25 +109,23 @@ def result_to_dataframe(result: rsatoolbox.inference.Result) -> pd.DataFrame:
 def load_models(
     include_models: typing.List[str],
     model_dir: os.PathLike = "models",
-) -> typing.List[rsatoolbox.model.Model]:
+) -> rsatoolbox.model.Model:
     """Load in model RDMs from HDF5 (.h5 / .hdf5) files.
 
     :param include_models: list of model names (filename prefixes) to include
     :param model_dir: directory containing model RDMs
     :returns: list of model RDMs
     """
-    model_list = []
-    for model_rdm_file in pathlib.Path(model_dir).glob("*.h*5"):
-        rdm = rsatoolbox.rdm.load_rdm(str(model_rdm_file))
-        # Assume the model RDMs' conditions are already sorted in the same
-        # order as the data RDMs' conditions
+    model_files = pathlib.Path(model_dir).glob("*.h*5")
+    rdms = [
+        rsatoolbox.rdm.load_rdm(str(model_file))
+        for model_file in model_files
+        if model_file.stem in include_models
+    ]
+    rdms = rsatoolbox.rdm.concat(rdms)
+    model = rsatoolbox.model.ModelWeighted("nnls", rdms)
 
-        model_name = model_rdm_file.stem
-        if model_name in include_models:
-            log.debug("Loading model: {}".format(model_name))
-            model_list.append(rsatoolbox.model.ModelFixed(model_name, rdm))
-
-    return model_list
+    return model
 
 
 def filename(cfg: DictConfig) -> str:
