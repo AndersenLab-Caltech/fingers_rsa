@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import rsatoolbox
 import seaborn as sns
+import sklearn.preprocessing
 import tqdm
 from omegaconf import DictConfig, OmegaConf
 
@@ -101,6 +102,9 @@ def load_models(
         if model_file.stem in include_models
     ]
     rdms = rsatoolbox.rdm.concat(rdms)
+    # Normalize component RDMs to unit-norm,
+    # so we can compare their weights fairly.
+    rdms.dissimilarities = sklearn.preprocessing.normalize(rdms.dissimilarities)
     model = rsatoolbox.model.ModelWeighted("nnls", rdms)
 
     return model
