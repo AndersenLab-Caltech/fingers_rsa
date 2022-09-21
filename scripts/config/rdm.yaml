@@ -15,3 +15,8 @@ metrics:
   distance: crossnobis
 
 rdm_file_type: hdf5
+
+# Rename multirun sub-directories based on overrides
+hydra:
+  sweep:
+    subdir: ${hydra.job.override_dirname}

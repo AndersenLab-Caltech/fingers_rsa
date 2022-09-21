@@ -3,13 +3,13 @@
 import glob
 import logging
 import os
-import pathlib
-import typing
 
 import hydra
 import matplotlib.pyplot as plt
 import rsatoolbox
 from omegaconf import DictConfig, OmegaConf
+
+from fingers_rsa import rdm_utils
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ def main(cfg: DictConfig) -> None:
     # Load in models. These should be saved as RDM files, too.
     if cfg.metrics.similarity.startswith("cosine"):
         cfg.rsa.models += ["unstructured"]
-    model_rdms = load_models(cfg.rsa.models)
+    model_rdms = rdm_utils.load_models(cfg.rsa.models)
 
     assert (
         data_rdms.n_rdm > 1
@@ -56,26 +56,6 @@ def main(cfg: DictConfig) -> None:
     log.info("Saved plot to file: {}".format(os.path.abspath(plot_filename)))
 
     plt.show()
-
-
-def load_models(
-    include_models: typing.List[str],
-    model_dir: os.PathLike = "models",
-) -> typing.List[rsatoolbox.model.Model]:
-    """Load in models from a list."""
-    # Load model rdms from HDF5 (.h5 / .hdf5) files
-    model_list = []
-    for model_rdm_file in pathlib.Path(model_dir).glob("*.h*5"):
-        rdm = rsatoolbox.rdm.load_rdm(str(model_rdm_file))
-        # Assume the model RDMs' conditions are already sorted in the same
-        # order as the data RDMs' conditions
-
-        model_name = model_rdm_file.stem
-        if model_name in include_models:
-            log.debug("Loading model: {}".format(model_name))
-            model_list.append(rsatoolbox.model.ModelFixed(model_name, rdm))
-
-    return model_list
 
 
 def filename(cfg: DictConfig) -> str:
