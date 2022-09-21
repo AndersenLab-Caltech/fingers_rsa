@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import rsatoolbox
 import seaborn as sns
+import sklearn.linear_model
 import sklearn.preprocessing
 import tqdm
 from omegaconf import DictConfig, OmegaConf
@@ -102,23 +103,24 @@ def load_models(
         if model_file.stem in include_models
     ]
     rdms = rsatoolbox.rdm.concat(rdms)
-    # Normalize component RDMs to unit-norm,
-    # so we can compare their weights fairly.
-    rdms.dissimilarities = sklearn.preprocessing.normalize(rdms.dissimilarities)
     model = rsatoolbox.model.ModelWeighted("nnls", rdms)
 
     return model
 
 
 def fit_bootstrap(
-    model: rsatoolbox.model.Model,
+    model: rsatoolbox.model.ModelWeighted,
     data_rdms: rsatoolbox.rdm.RDMs,
-    fitter=rsatoolbox.model.fitter.Fitter(
-        rsatoolbox.model.fit_regress_nn, ridge_weight=1e-4
-    ),
     num_bootstrap: int = 1000,
 ) -> pd.DataFrame:
-    """Fit model to bootstrap samples of data."""
+    """Fit model weights to bootstrap samples of data.
+
+    :param model: model with component RDMs, whose weighted sum will
+        approximate the data
+    :param data_rdms: RDMs to fit model to
+    :param num_bootstrap: number of bootstrap samples of data_rdms to draw
+    :return: model weights for each bootstrap sample
+    """
     _ = rsatoolbox.util.inference_util.input_check_model(model)
     # Pre-allocate results
     model_weights_evaluations_df = pd.DataFrame(
@@ -128,10 +130,28 @@ def fit_bootstrap(
             model.rdm_obj.rdm_descriptors["model_name"], name="model"
         ),
     )
+
+    # Normalize component RDMs to unit-norm,
+    # so we can compare their weights fairly.
+    model_rdms = model.rdm_obj
+    X = sklearn.preprocessing.normalize(model_rdms.dissimilarities).T
+
     # Fit model weights to bootstrap samples
     for bootstrap_idx in tqdm.trange(num_bootstrap, desc="bootstrap"):
         sampled_rdms, _ = rsatoolbox.inference.bootstrap_sample_rdm(data_rdms)
-        model_weights = fitter(model, sampled_rdms)
+        y = sampled_rdms.dissimilarities.T
+
+        # Fit weights over bootstrap samples & take mean weights
+        model_weights = (
+            sklearn.linear_model.Lasso(
+                alpha=3e-3,
+                fit_intercept=False,
+                positive=True,
+            )
+            .fit(X, y)
+            .coef_
+        )
+        model_weights = model_weights.mean(axis=0)
         model_weights_evaluations_df.iloc[bootstrap_idx] = model_weights
 
     return model_weights_evaluations_df
