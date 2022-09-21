@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import rsatoolbox
 import seaborn as sns
+import tqdm
 from omegaconf import DictConfig, OmegaConf
 
 log = logging.getLogger(__name__)
@@ -58,27 +59,20 @@ def main(cfg: DictConfig) -> None:
         rdm_counts > 1
     ).all(), "Need more than one RDM to calculate RSA confidence intervals"
 
-    # RDA: run representational similarity analysis for each window center
-    method = "cosine_cov"  # Method for normalization
+    # RDA: fit linear regression for RDM calculated at each window_center
     results_ser = data_rdms_ser.apply(
-        lambda data_rdms: rsatoolbox.inference.eval_bootstrap_rdm(
-            models=model,
-            data=data_rdms,
-        )
+        lambda data_rdms: fit_bootstrap(model=model, data_rdms=data_rdms)
     )
-
-    # Convert RSA Result objects to evaluations
-    evaluations_ser = results_ser.apply(result_to_dataframe)
-    evaluations_wide_df = pd.concat(
-        evaluations_ser.tolist(), keys=evaluations_ser.index
-    )
-    evaluations_df = evaluations_wide_df.melt(value_name=method, ignore_index=False)
+    # Convert to long-format for plotting
+    results_wide_df = pd.concat(results_ser.tolist(), keys=results_ser.index)
+    value_name = "model_weight"
+    results_df = results_wide_df.melt(value_name=value_name, ignore_index=False)
 
     # Plot results
     ax = sns.lineplot(
-        data=evaluations_df,
+        data=results_df,
         x="window_center",
-        y=method,
+        y=value_name,
         hue="model",
         # TODO: double-check error-bar matches previous version
         errorbar="sd",  # standard deviation of bootstrap -> confidence interval
@@ -88,22 +82,6 @@ def main(cfg: DictConfig) -> None:
     plot_filename = filename_prefix
     ax.figure.savefig(plot_filename)
     log.info("Saved plot to file: {}".format(os.path.abspath(plot_filename)))
-
-
-def result_to_dataframe(result: rsatoolbox.inference.Result) -> pd.DataFrame:
-    """Convert rsatoolbox Result to plottable DataFrame.
-
-    :param result: RSA result object to convert
-    :returns: [sample, model]-shaped DataFrame with evaluation values
-    """
-    df = pd.DataFrame(
-        result.evaluations,
-        columns=[model.name for model in result.models],
-    )
-    df.columns.name = "model"
-    df.index.name = "bootstrap sample"
-
-    return df
 
 
 def load_models(
@@ -126,6 +104,33 @@ def load_models(
     model = rsatoolbox.model.ModelWeighted("nnls", rdms)
 
     return model
+
+
+def fit_bootstrap(
+    model: rsatoolbox.model.Model,
+    data_rdms: rsatoolbox.rdm.RDMs,
+    fitter=rsatoolbox.model.fitter.Fitter(
+        rsatoolbox.model.fit_regress_nn, ridge_weight=1e-4
+    ),
+    num_bootstrap: int = 1000,
+) -> pd.DataFrame:
+    """Fit model to bootstrap samples of data."""
+    _ = rsatoolbox.util.inference_util.input_check_model(model)
+    # Pre-allocate results
+    model_weights_evaluations_df = pd.DataFrame(
+        data=0,
+        index=pd.RangeIndex(num_bootstrap, name="bootstrap sample"),
+        columns=pd.CategoricalIndex(
+            model.rdm_obj.rdm_descriptors["model_name"], name="model"
+        ),
+    )
+    # Fit model weights to bootstrap samples
+    for bootstrap_idx in tqdm.trange(num_bootstrap, desc="bootstrap"):
+        sampled_rdms, _ = rsatoolbox.inference.bootstrap_sample_rdm(data_rdms)
+        model_weights = fitter(model, sampled_rdms)
+        model_weights_evaluations_df.iloc[bootstrap_idx] = model_weights
+
+    return model_weights_evaluations_df
 
 
 def filename(cfg: DictConfig) -> str:
