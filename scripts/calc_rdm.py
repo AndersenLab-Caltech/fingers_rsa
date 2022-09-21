@@ -95,7 +95,7 @@ def generate_rdm(
         "task_name": cfg.task.name,
         "subject": cfg.array.subject,
         "session": cfg.session,
-        "window_center": cfg.window.start + cfg.window.length / 2,
+        "window_center": round(cfg.window.start + cfg.window.length / 2, ndigits=4),
         "window_length": cfg.window.length,
     }
     dataset = rsatoolbox.data.Dataset(

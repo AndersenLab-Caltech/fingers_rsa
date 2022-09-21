@@ -12,7 +12,7 @@ pandas = "^1.2"
 numpy = "^1.13"
 xarray = "^2022.3"
 prince = {git = "https://github.com/MaxHalford/prince.git", rev="c18eff92efbac57e4cd3657a6999cee8d1fcb906"}
-rsatoolbox = "0.0.4"
+rsatoolbox = {git = "https://github.com/rsagroup/rsatoolbox.git", rev="a0630f054d11dae403ade8745751ac8f7b36e070"}
 hydra-core = "^1.1"
 hydra-colorlog = "^1.1"
 matplotlib = "^3.5"
