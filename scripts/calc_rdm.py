@@ -87,11 +87,11 @@ def generate_rdm(
 
     # Filter out other trials (e.g., null-condition trials)
     trial_mask = np.isin(trial_labels, condition_order)
-    measurements = measurements[trial_mask]
-    trial_labels = trial_labels[trial_mask]
+    measurements_without_null = measurements[trial_mask]
+    trial_labels_without_null = trial_labels[trial_mask]
 
     # Convert data rsatoolbox Dataset object
-    observation_descriptors = {cfg.task.condition_column: trial_labels}
+    observation_descriptors = {cfg.task.condition_column: trial_labels_without_null}
     descriptors = {
         "task_name": cfg.task.name,
         "subject": cfg.array.subject,
@@ -100,7 +100,7 @@ def generate_rdm(
         "window_length": cfg.window.length,
     }
     dataset = rsatoolbox.data.Dataset(
-        measurements=measurements,
+        measurements=measurements_without_null,
         descriptors=descriptors,
         obs_descriptors=observation_descriptors,
     )
@@ -115,6 +115,7 @@ def generate_rdm(
         dataset,
         method=cfg.metrics.distance,
         descriptor=cfg.task.condition_column,
+        prior_lambda=measurements.mean(),
         cv_descriptor=cv_descriptor,
     )
 
