@@ -58,6 +58,7 @@ def main(cfg: DictConfig) -> None:
         cmap=mpl.rcParams["image.cmap"],
         rdm_descriptor="session",
         show_colorbar="figure",
+        nanmask=np.zeros((num_pattern_groups, num_pattern_groups), dtype=bool),
         vmin=0,
         num_pattern_groups=num_pattern_groups,
     )
