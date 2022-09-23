@@ -9,6 +9,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import rsatoolbox
+import sklearn.model_selection
 from hydra.utils import get_original_cwd
 from omegaconf import DictConfig, OmegaConf
 
@@ -104,14 +105,47 @@ def generate_rdm(
         obs_descriptors=observation_descriptors,
     )
 
+    # Split data into independent sets
+    cv_descriptor = "cv_desc"
+    dataset.obs_descriptors[cv_descriptor] = split_dataset(
+        dataset, cfg.task.condition_column
+    )
+
     rdm = rsatoolbox.rdm.calc_rdm(
-        dataset, method=cfg.metrics.distance, descriptor=cfg.task.condition_column
+        dataset,
+        method=cfg.metrics.distance,
+        descriptor=cfg.task.condition_column,
+        cv_descriptor=cv_descriptor,
     )
 
     # Sort RDMs by condition order for visualization
     rdm.sort_by(**{cfg.task.condition_column: condition_order})
 
     return rdm
+
+
+def split_dataset(
+    dataset: rsatoolbox.data.Dataset, label_obs_descriptor: str
+) -> np.ndarray:
+    """Split dataset into independent folds.
+
+    :param dataset: Dataset object with observations / measurements
+    :param label_obs_descriptor: field within dataset.obs_descriptor that
+        corresponds to the split-label (for StratifiedKFolds)
+    :return: [n_obs] array indicating fold IDs for each observation
+    """
+    fold_ids = -np.ones(dataset.n_obs, dtype=int)
+    assert (fold_ids < 0).all()
+
+    # Splits should be grouped by time-block, so don't shuffle
+    skf = sklearn.model_selection.StratifiedKFold(shuffle=False)
+    for fold_id, (_, fold_indices) in enumerate(
+        skf.split(dataset.measurements, dataset.obs_descriptors[label_obs_descriptor])
+    ):
+        fold_ids[fold_indices] = fold_id
+    assert (fold_ids >= 0).all(), "Some observations were not assigned to a fold"
+
+    return fold_ids
 
 
 if __name__ == "__main__":
