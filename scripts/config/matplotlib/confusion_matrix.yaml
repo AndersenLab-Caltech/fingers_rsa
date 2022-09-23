@@ -1,4 +1,4 @@
-savefig.format: svg # {png, ps, pdf, svg}
+savefig.format: png # {png, ps, pdf, svg}
 savefig.bbox: tight # {tight, standard}
 svg.fonttype: none # {none, path}
 font.size: 16
