@@ -7,4 +7,4 @@ defaults:
 metrics:
   similarity: cosine_cov
 
-rdm_files: "multirun/2022-09-20/14-34-13/*/*_rdm.hdf5"
+rdm_files: "/path/to/repo/multirun/run_date/run_time/*/*_rdm.hdf5"
