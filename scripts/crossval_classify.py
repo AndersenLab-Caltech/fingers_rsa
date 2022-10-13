@@ -23,7 +23,7 @@ from fingers_rsa import nwb_utils, plot_utils
 log = logging.getLogger(__name__)
 
 
-@hydra.main(config_path="config", config_name="crossval_classify")
+@hydra.main(config_path="config", config_name="crossval_classify", version_base="1.1")
 def main(cfg: DictConfig) -> None:
     log.debug("Config args:\n{}".format(OmegaConf.to_yaml(cfg)))
     log.debug("Working directory: {}".format(os.getcwd()))
