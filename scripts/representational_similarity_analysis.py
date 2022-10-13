@@ -20,6 +20,7 @@ def main(cfg: DictConfig) -> None:
 
     # Convert config parameters as needed
     data_rdm_files = glob.glob(cfg.rdm_files)
+    assert len(data_rdm_files) > 0, "No RDM files found at: {}.".format(cfg.rdm_files)
     filename_prefix = filename(cfg)
 
     # Read in the RDM files

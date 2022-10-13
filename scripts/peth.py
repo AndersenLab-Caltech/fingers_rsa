@@ -23,7 +23,7 @@ from fingers_rsa import nwb_utils
 log = logging.getLogger(__name__)
 
 
-@hydra.main(config_path="config", config_name="peth", version_base=None)
+@hydra.main(config_path="config", config_name="peth", version_base="1.1")
 def main(cfg: DictConfig) -> None:
     log.debug("Config args:\n{}".format(OmegaConf.to_yaml(cfg)))
 
