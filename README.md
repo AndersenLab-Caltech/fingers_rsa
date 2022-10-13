@@ -49,14 +49,14 @@ The scripts will also log their working/output directory to the console.
 
 To [calculate the representational dissimilarity matrices](scripts/calc_rdm.py) (RDMs), you need to specify the sessions to use for the RSA analysis.
 ```bash
-python scripts/calc_rdm.py --multirun session=2018-09-10,2018-09-17a,2018-09-17b,2018-09-24,2018-09-26,2018-10-01,2018-10-12,2018-10-15,2018-10-17,2018-10-22 hydra/launcher=joblib
+python scripts/calc_rdm.py --multirun session=2018-09-10,2018-09-17a,2018-09-17b,2018-09-24,2018-09-26,2018-10-01,2018-10-12,2018-10-15,2018-10-17,2018-10-22
 ```
 The following command is equivalent:
 ```bash
 python scripts/calc_rdm.py -m +sweep=all_sessions
 ```
 With the `--multirun` (`-m`) option, Hydra effectively runs `calc_rdm.py` 10 times, once for each session.
-Aligning and binning spikes takes some time, so you can parallelize multiruns using the `joblib` launcher with the additional command-line argument: `hydra/launcher=joblib`.
+Aligning and binning spikes takes some time, so you can parallelize multiruns using `joblib` with the additional command-line argument: `hydra/launcher=joblib`.
 
 The `calc_rdm.py` multirun will generate outputs in `multirun/date/time/run/` directories (e.g., `outputs/2022-10-13/09-51-04/0`).
 The output RDM absolute paths are also logged by `calc_rdm.py`, e.g.:
