@@ -97,12 +97,14 @@ def load_models(
     :param model_dir: directory containing model RDMs
     :returns: list of model RDMs
     """
-    model_files = pathlib.Path(model_dir).glob("*.h*5")
+    model_files = pathlib.Path(hydra.utils.to_absolute_path(model_dir)).glob("*.h*5")
+    assert model_files, "No hdf5 files found in: {}".format(model_dir)
     rdms = [
         rsatoolbox.rdm.load_rdm(str(model_file))
         for model_file in model_files
         if model_file.stem in include_models
     ]
+    assert rdms, "Expected RDM files not found in: {}".format(list(model_files))
     rdms = rsatoolbox.rdm.concat(rdms)
     model = rsatoolbox.model.ModelWeighted("nnls", rdms)
 

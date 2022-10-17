@@ -30,7 +30,10 @@ def main(cfg: DictConfig) -> None:
     # Load in models. These should be saved as RDM files, too.
     if cfg.metrics.similarity.startswith("cosine"):
         cfg.rsa.models += ["unstructured"]
-    model_rdms = rdm_utils.load_models(cfg.rsa.models)
+    model_rdms = rdm_utils.load_models(
+        cfg.rsa.models, model_dir=hydra.utils.to_absolute_path("models")
+    )
+    assert model_rdms, "No models found with cfg: {}".format(cfg.rsa.models)
 
     assert (
         data_rdms.n_rdm > 1
