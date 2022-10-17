@@ -134,6 +134,11 @@ def generate_rdm(
         prior_lambda=measurements.mean(),
         cv_descriptor=cv_descriptor,
     )
+    if cfg.metrics.denormalize_channels:
+        # rsatoolbox intrinsically normalizes the RDMs by the number of channels
+        # Note: this does not work for Euclidean distance,
+        # where normalization factor is sqrt(n_channels)
+        rdm.dissimilarities *= measurements.shape[1]
 
     # Sort RDMs by condition order for visualization
     rdm.sort_by(**{cfg.task.condition_column: condition_order})
