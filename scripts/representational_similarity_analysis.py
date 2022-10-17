@@ -31,6 +31,7 @@ def main(cfg: DictConfig) -> None:
     if cfg.metrics.similarity.startswith("cosine"):
         cfg.rsa.models += ["unstructured"]
     model_rdms = rdm_utils.load_models(cfg.rsa.models)
+    assert model_rdms, "No models found with cfg: {}".format(cfg.rsa.models)
 
     assert (
         data_rdms.n_rdm > 1
