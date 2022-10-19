@@ -11,7 +11,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import pynwb
 from hydra.utils import get_original_cwd
 from omegaconf import DictConfig, OmegaConf
 from sklearn.metrics import accuracy_score
@@ -95,7 +94,12 @@ def cv_results(
         f"sub-{cfg.array.subject}_ses-{session}_ecephys.nwb",
     )
     log.debug("Loading NWB file: {}".format(nwb_path))
-    trial_spike_counts, trial_labels = read_trial_features(nwb_path, cfg)
+    trial_spike_counts, trial_labels = nwb_utils.read_trial_features(
+        nwb_path,
+        cfg.task.condition_column,
+        start=cfg.window.start,
+        end=cfg.window.start + cfg.window.length,
+    )
 
     # Classifier and cross-validation methods
     clf = hydra.utils.instantiate(cfg.classifier)
@@ -113,29 +117,6 @@ def cv_results(
 
     log.debug("Finished processing NWB file: {}".format(nwb_path))
     return results_df
-
-
-def read_trial_features(
-    nwb_path: os.PathLike, cfg: DictConfig
-) -> Tuple[pd.DataFrame, pd.Series]:
-    """Reads trial spike counts and labels from NWB file.
-
-    :param nwb_path: path to NWB file
-    :param cfg: Hydra config object
-    :returns: tuple of (spike counts, labels)
-    """
-    with pynwb.NWBHDF5IO(nwb_path, mode="r") as nwb_file:
-        nwb = nwb_file.read()
-        # nwb_file must remain open while `nwb` object is in use.
-
-        trial_spike_counts = nwb_utils.count_trial_spikes(
-            nwb,
-            start=cfg.window.start,
-            end=cfg.window.start + cfg.window.length,
-        )
-        trial_labels: pd.Series = nwb.trials.to_dataframe()[cfg.task.condition_column]
-
-    return trial_spike_counts, trial_labels
 
 
 def log_summary_metrics(y_true: pd.Series, y_pred: pd.Series) -> Tuple[float, float]:
