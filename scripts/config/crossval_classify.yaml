@@ -9,9 +9,6 @@ window:
   length: 1.0
   start: 0.5
 
-neuron_criteria:
-  min_firing_rate: 0.5 # Hz
-
 crossvalidation:
   _target_: sklearn.model_selection.StratifiedKFold
   n_splits: 8
