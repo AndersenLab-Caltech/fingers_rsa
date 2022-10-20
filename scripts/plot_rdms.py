@@ -49,7 +49,7 @@ def main() -> None:
     fig.savefig(save_path)
 
     fig, ax = plt.subplots()
-    plot_mds(rdms, colors=args.colors, ax=ax)
+    plot_mds(rdms, colors=args.colors, plot_raw=args.plot_raw, ax=ax)
     save_path = args.output_dir.joinpath("mds")
     print("Saving MDS plot to:", save_path)
     fig.savefig(save_path)
@@ -88,6 +88,12 @@ def parse_args() -> argparse.Namespace:
         default=["#4477AA", "#66CCEE", "#228833", "#CCBB44", "#EE6677"],
         help="Order of colors to use for pattern-descriptor plotting",
     )
+    parser.add_argument(
+        "--plot-raw",
+        action="store_true",
+        default=False,
+        help="Whether to overlay individual MDS on the aggregate plot",
+    )
 
     return parser.parse_args()
 
@@ -97,7 +103,8 @@ def plot_mds(
     rdm_descriptor: str = "session",
     pattern_descriptor: str = "finger",
     colors: Optional[List[str]] = None,
-    scale: bool = True,
+    scale: bool = False,
+    plot_raw: bool = False,
     ax: mpl.axes.Axes = None,
 ) -> None:
     """Plot multidimensional scaling of representational dissimilarities."""
@@ -128,6 +135,16 @@ def plot_mds(
         condition_order=mds_da.coords[pattern_descriptor].values,
         colors=colors,
     )
+
+    if plot_raw:
+        mds_utils.make_mds_plot_prealigned(
+            mds_da.values,
+            ax=ax,
+            condition_order=mds_da.coords[pattern_descriptor].values,
+            markers=["."] * len(colors),
+            colors=colors,
+            raw=True,
+        )
 
 
 if __name__ == "__main__":
