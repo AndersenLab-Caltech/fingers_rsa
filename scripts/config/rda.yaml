@@ -1,6 +1,7 @@
 defaults:
   - array: ns_ppc
   - rsa/models: muscle_somatotopic
+  - matplotlib: base
   - override hydra/job_logging: colorlog
   - _self_ # Override defaults list with below values
 

@@ -7,6 +7,7 @@ import pathlib
 import typing
 
 import hydra
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import rsatoolbox
@@ -22,6 +23,9 @@ log = logging.getLogger(__name__)
 @hydra.main(config_path="config", config_name="rda", version_base="1.1")
 def main(cfg: DictConfig) -> None:
     log.debug("Config args:\n{}".format(OmegaConf.to_yaml(cfg)))
+
+    # Update display parameters
+    plt.rcParams.update(cfg.matplotlib)
 
     # Convert config parameters as needed
     data_rdm_files = glob.glob(cfg.rdm_files)
