@@ -6,7 +6,7 @@ authors = ["Charles Guan <cguan@caltech.edu>"]
 license = "GNU GPLv3"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8,<3.12"
 pynwb = "^2.1"
 pandas = "^1.2"
 numpy = "^1.13"
@@ -25,11 +25,11 @@ tqdm = ">=4.0"
 
 [tool.poetry.dev-dependencies]
 hydra-joblib-launcher = "^1.2"  # Parallel job launching
-pudb = ""       # debugger
-pre-commit = "" # hooks for applying linters on commit
-black = ""      # code formatting
-isort = ""      # import sorting
-flake8 = ""     # code analysis
+pudb = "*"       # debugger
+pre-commit = "*" # hooks for applying linters on commit
+black = "*"      # code formatting
+isort = "*"      # import sorting
+flake8 = "*"     # code analysis
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
